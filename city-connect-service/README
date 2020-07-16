@@ -3,7 +3,7 @@ This application is built using using Spring Boot & Java 1.8.
 This is web service which determines if two cities are connected. Two cities are considered connected if there’s a series of roads that can be traveled from one city to another. 
 Any unexpected input should result in a ’no’ response
 
-Requirements:
+Software Requirements:
 Requires Maven 3 or newer and Java JDK 8 or newer.
 
 To build the jar:
