@@ -1,18 +1,20 @@
 package com.mastercard.coding.challenge.service;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -33,16 +35,16 @@ public class CityConnectService {
 	private ResourceLoader resourceLoader;
 
 	private CityConnectGraph cityConnectGraph;
+	@Value("${city.connect.service.routes.file.name}")
+	private String sourceFileName;
+	@Value("${city.connect.service.routes.file.path}")
+	private String sourceFilePath;
 
 	private static final String YES = "Yes";
 	private static final String NO = "No";
 	private static final String DELIMITER = ",";
-	
-	private Logger LOGGER = LoggerFactory.getLogger(CityConnectController.class);
 
-	private Resource loadData() {
-		return resourceLoader.getResource("classpath:city.txt");
-	}
+	private Logger LOGGER = LoggerFactory.getLogger(CityConnectController.class);
 
 	/**
 	 * This method is used to load the data from city.txt file which has route
@@ -55,24 +57,21 @@ public class CityConnectService {
 	@PostConstruct
 	private void prepareCityConnectGraph() {
 		cityConnectGraph = new CityConnectGraph();
-		Resource dataSource = loadData();
 		LOGGER.debug("Invoking prepareCityConnectGraph to load the city routes");
-		File file = null;
 		try {
-			file = dataSource.getFile();
-			Stream<String> lines = Files.lines(file.toPath());
-			List<String> cityRoutes = lines.collect(Collectors.toList());
-			for (String route : cityRoutes) {
-				String[] data = route.split(DELIMITER);
-				if(data.length > 2) {
-					lines.close();
-					throw new FileFormatNotSupportedException("Input file format is not supported");
+			InputStream resource = new ClassPathResource(sourceFileName).getInputStream();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource))) {
+				List<String> cityRoutes = reader.lines().collect(Collectors.toList());
+				for (String route : cityRoutes) {
+					String[] data = route.split(DELIMITER);
+					if (data.length > 2) {
+						throw new FileFormatNotSupportedException("Input file format is not supported");
+					}
+					cityConnectGraph.addTwoWayRoute(data[0].toLowerCase().trim(), data[1].toLowerCase().trim());
 				}
-				cityConnectGraph.addTwoWayRoute(data[0].toLowerCase().trim(), data[1].toLowerCase().trim());
 			}
-			lines.close();
 		} catch (IOException e) {
-			LOGGER.error("Failed to load the city routes by reading the file at path: " + file.toPath());
+			LOGGER.error("Failed to load the city routes by reading the file at path: " + sourceFilePath);
 			LOGGER.debug(e.getMessage());
 			e.printStackTrace();
 		}
@@ -88,13 +87,17 @@ public class CityConnectService {
 	 * @return
 	 */
 	public String areTwoCitiesConnected(String originCity, String destinationCity) {
+		LOGGER.debug("Invoking areTwoCitiesConnected service method for origin city: {} & destination city: {}",
+				originCity, destinationCity);
 		LinkedList<String> visited = new LinkedList<String>();
 		visited.add(originCity.toLowerCase().trim());
 		if (originCity.isBlank() || destinationCity.isBlank()) {
 			return NO;
 		} else if (cityConnectGraph.areTwoCitiesConnected(cityConnectGraph, originCity, destinationCity, visited)) {
+			LOGGER.debug("Route Found");
 			return YES;
 		}
+		LOGGER.debug("Route Not Found");
 		return NO;
 	}
 }
