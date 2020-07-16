@@ -1,0 +1,30 @@
+# city-connect-service
+This is web service which determines if two cities are connected. Two cities are considered connected 
+if there’s a series of roads that can be traveled from one city to another. 
+Any unexpected input should result in a ’no’ response
+
+Requirements:
+  Requires Maven 3 or newer and Java JDK 8 or newer.
+
+To build the jar:
+  mvn clean install
+
+To run tests and coverage report:
+  mvn clean verify
+
+
+To run:
+  java -jar city-connect-service-0.0.1-SNAPSHOT.jar.
+
+URL format:
+    http://localhost:8080/connected?origin=city1&destination=city2
+
+Example usage:
+    > curl http://localhost:8080/connected?origin=Boston&destination=Newark
+    Yes
+
+    > curl http://localhost:8080/connected?origin=Philadelphia&destination=Albany
+    No
+	
+To see api documentation:
+	http://localhost:8080/swagger-ui.html
