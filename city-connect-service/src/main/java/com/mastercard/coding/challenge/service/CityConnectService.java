@@ -31,15 +31,9 @@ import com.mastercard.coding.challenge.resource.CityConnectGraph;
 @Service
 public class CityConnectService {
 
-	@Autowired
-	private ResourceLoader resourceLoader;
-
 	private CityConnectGraph cityConnectGraph;
 	@Value("${city.connect.service.routes.file.name}")
 	private String sourceFileName;
-	@Value("${city.connect.service.routes.file.path}")
-	private String sourceFilePath;
-
 	private static final String YES = "Yes";
 	private static final String NO = "No";
 	private static final String DELIMITER = ",";
@@ -71,7 +65,7 @@ public class CityConnectService {
 				}
 			}
 		} catch (IOException e) {
-			LOGGER.error("Failed to load the city routes by reading the file at path: " + sourceFilePath);
+			LOGGER.error("Failed to load the city routes by reading the file at classpath: " + sourceFileName);
 			LOGGER.debug(e.getMessage());
 			e.printStackTrace();
 		}
