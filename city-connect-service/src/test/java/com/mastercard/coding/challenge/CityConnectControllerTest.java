@@ -31,64 +31,85 @@ public class CityConnectControllerTest {
 	
 	@Test
 	public void  isConnected_whenCitiesConnectedViaAnotherCity() throws Exception {
-		mockMvc.perform(get("/connected?origin=Boston&destination=Newark")).andExpect(status().isOk())
+		mockMvc.perform(get("/connected?origin=Boston&destination=Philadelphia")).andExpect(status().isOk())
 				.andExpect(MockMvcResultMatchers.content().string("Yes")).andReturn().getResponse().getContentAsString();
 
 	}
 	
 	@Test
 	public void  isConnected_whenCitiesAreNotConnected() throws Exception {
-		mockMvc.perform(get("/connected?origin=Boston&destination=Newark")).andExpect(status().isOk())
-				.andExpect(MockMvcResultMatchers.content().string("Yes")).andReturn().getResponse().getContentAsString();
+		mockMvc.perform(get("/connected?origin=Philadelphia&destination=Albany")).andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("No")).andReturn().getResponse().getContentAsString();
 
 	}
 	
 	@Test
 	public void  isConnected_whenOriginCityIsBlank() throws Exception {
-		mockMvc.perform(get("/connected?origin=Boston&destination=Newark")).andExpect(status().isOk())
-				.andExpect(MockMvcResultMatchers.content().string("Yes")).andReturn().getResponse().getContentAsString();
+		mockMvc.perform(get("/connected?origin=&destination=Newark")).andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("No")).andReturn().getResponse().getContentAsString();
 
 	}
 	
 	@Test
 	public void  isConnected_whenDestinationCityIsBlank() throws Exception {
-		mockMvc.perform(get("/connected?origin=Boston&destination=Newark")).andExpect(status().isOk())
-				.andExpect(MockMvcResultMatchers.content().string("Yes")).andReturn().getResponse().getContentAsString();
+		mockMvc.perform(get("/connected?origin=Boston&destination=")).andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("No")).andReturn().getResponse().getContentAsString();
 
 	}
 	
 	@Test
 	public void  isConnected_whenCitiesNameDoesNotExist() throws Exception {
-		mockMvc.perform(get("/connected?origin=Boston&destination=Newark")).andExpect(status().isOk())
-				.andExpect(MockMvcResultMatchers.content().string("Yes")).andReturn().getResponse().getContentAsString();
+		mockMvc.perform(get("/connected?origin=Paris&destination=Toronto")).andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("No")).andReturn().getResponse().getContentAsString();
 
 	}
 	
 	@Test
 	public void  isConnected_whenOriginCityDoesNotExist() throws Exception {
-		mockMvc.perform(get("/connected?origin=Boston&destination=Newark")).andExpect(status().isOk())
-				.andExpect(MockMvcResultMatchers.content().string("Yes")).andReturn().getResponse().getContentAsString();
+		mockMvc.perform(get("/connected?origin=Paris&destination=Newark")).andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("No")).andReturn().getResponse().getContentAsString();
 
 	}
 	
 	@Test
 	public void  isConnected_whenDestinationCityDoesNotExist() throws Exception {
-		mockMvc.perform(get("/connected?origin=Boston&destination=Newark")).andExpect(status().isOk())
-				.andExpect(MockMvcResultMatchers.content().string("Yes")).andReturn().getResponse().getContentAsString();
+		mockMvc.perform(get("/connected?origin=Boston&destination=Toronto")).andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("No")).andReturn().getResponse().getContentAsString();
 
 	}
 
 	
 	@Test
-	public void  isConnected_whenGivenInvalidOriginCity() throws Exception {
-		mockMvc.perform(get("/connected?origin=Boston&destination=Newark")).andExpect(status().isOk())
+	public void  isConnected_whenInvalidOriginCity() throws Exception {
+		mockMvc.perform(get("/connected?origin=abcd&destination=Newark")).andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("No")).andReturn().getResponse().getContentAsString();
+
+	}
+	
+	@Test
+	public void  isConnected_whenInvalidDestinationCity() throws Exception {
+		mockMvc.perform(get("/connected?origin=Boston&destination=abcd")).andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("No")).andReturn().getResponse().getContentAsString();
+
+	}
+	
+	@Test
+	public void  isConnected_whenCitiesAreConnectedButHavingUppercaseNames() throws Exception {
+		mockMvc.perform(get("/connected?origin=BOSTON&destination=NEWARK")).andExpect(status().isOk())
 				.andExpect(MockMvcResultMatchers.content().string("Yes")).andReturn().getResponse().getContentAsString();
 
 	}
 	
 	@Test
-	public void  isConnected_whenGivenInvalidDestinationCity() throws Exception {
-		mockMvc.perform(get("/connected?origin=Boston&destination=Newark")).andExpect(status().isOk())
+	public void  isConnected_whenCitiesAreConnectedButHavingLowercaseNames() throws Exception {
+		mockMvc.perform(get("/connected?origin=boston&destination=newark")).andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("Yes")).andReturn().getResponse().getContentAsString();
+
+	}
+	
+	@Test
+	public void  isConnected_whenCitiesAreConnectedButHavingMixedcaseNames() throws Exception {
+		mockMvc.perform(get("/connected?origin=Boston&destination=newark")).andExpect(status().isOk())
 				.andExpect(MockMvcResultMatchers.content().string("Yes")).andReturn().getResponse().getContentAsString();
 
 	}
